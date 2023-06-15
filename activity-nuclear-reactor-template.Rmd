@@ -1,6 +1,6 @@
 ---
 title: "Activity: Nuclear Reactors"
-author: "YOUR NAME HERE"
+author: "Daniel Gao"
 output: html_notebook
 ---
 
@@ -13,7 +13,14 @@ library(tidyverse)
 
 ```{r}
 #My code here.... 
+library(rvest)
 
+page <- "https://en.wikipedia.org/wiki/List_of_commercial_nuclear_reactors#"
+tableList <- page %>%
+  read_html() %>%
+  html_nodes(css = "table") %>%
+  html_table(fill = TRUE)
+japan <- (tableList[[21]][-1 , 1:9])
 
 ```
 
@@ -21,14 +28,17 @@ library(tidyverse)
 ## Your turn: In what ways is the table tidy? How is it not tidy? What’s different about it from a tidy table?
 
 My answer here..... 
-
+This data is tidy as each variable has its own column, each case has its own row, and each value has its own cell.
 
 ## Your Turn: Plot Net Generation Capacity vs Construction Date
 
 ```{r}
 #my code here 
-
-
+japan %>% 
+  ggplot(aes(x = `Capacity(MW)`, y = `Beginbuilding`)) +
+  geom_point(shape = "circle", size = 0.5) +
+  xlab("Net Generation Capacity") +
+  ylab("Construction Date")
 ```
 
 
@@ -36,6 +46,7 @@ My answer here.....
 
 ```{r}
 #my code here... 
+
 
 ```
 
