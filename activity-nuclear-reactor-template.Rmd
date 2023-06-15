@@ -6,7 +6,7 @@ output: html_notebook
 
 ```{r}
 library(tidyverse)
-
+library(lubridate)
 ```
 
 ## Scrape the Data 
@@ -20,7 +20,24 @@ tableList <- page %>%
   read_html() %>%
   html_nodes(css = "table") %>%
   html_table(fill = TRUE)
-japan <- (tableList[[21]][-1 , 1:9])
+ 
+japan <-
+  (tableList[[21]][-1 , 1:9]) %>%
+  rename(name = Plantname, 
+         reactor = `UnitNo.`,
+         model = Type,
+         status = Status, 
+         netMW = `Capacity(MW)`,
+          construction = Beginbuilding,
+         operation = `Commercialoperation`, 
+         closure = Closed) 
+japan %>%
+  mutate(reactor = as.integer(reactor), 
+         netMW = as.integer(netMW),
+         operation = dmy(operation),
+         closure = dmy(closure),
+         construction = dmy(construction)) %>%
+  head()
 
 ```
 
@@ -34,9 +51,9 @@ This data is tidy as each variable has its own column, each case has its own row
 
 ```{r}
 #my code here 
-japan %>% 
-  ggplot(aes(x = `Capacity(MW)`, y = `Beginbuilding`)) +
-  geom_point(shape = "circle", size = 0.5) +
+japan %>%
+  ggplot(aes(x = netMW, y = construction )) +
+  geom_point(shape = "circle", size = 1) +
   xlab("Net Generation Capacity") +
   ylab("Construction Date")
 ```
@@ -46,8 +63,25 @@ japan %>%
 
 ```{r}
 #my code here... 
-china <- (tableList[[10]][-1 , 1:9])
-chinajapan <- rbind(china, japan)
+china <- (tableList[[10]][-1 , 1:9]) %>%
+  rename(name = Plantname, 
+         reactor = `UnitNo.`,
+         model = Type,
+         status = Status, 
+         netMW = `Capacity(MW)`,
+          construction = Beginbuilding,
+         operation = `Commercialoperation`, 
+         closure = Closed) 
+china %>%
+  mutate(reactor = as.integer(reactor), 
+         netMW = as.integer(netMW),
+         operation = dmy(operation),
+         closure = dmy(closure),
+         construction = dmy(construction)) %>%
+  head()
+chinajapan <- rbind(china, japan) 
+chinajapan %>% 
+  head()
 
 ```
 
@@ -58,4 +92,7 @@ chinajapan <- rbind(china, japan)
 ```{r}
 #My code here
 
+japan %>%
+  ggplot(aes(x = operation, y = name)) +
+  geom_segment(aes(x = construction, xend = operation, yend = name, color = model, size = status, shape = status)) 
 ```
