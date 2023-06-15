@@ -46,7 +46,8 @@ japan %>%
 
 ```{r}
 #my code here... 
-
+china <- (tableList[[10]][-1 , 1:9])
+chinajapan <- rbind(china, japan)
 
 ```
 
